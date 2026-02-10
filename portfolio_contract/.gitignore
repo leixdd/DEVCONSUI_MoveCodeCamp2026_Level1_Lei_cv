@@ -43,3 +43,7 @@ move_book/
 
 #move lock
 Move.lock
+
+#Published.toml
+Published.toml
+Pub.local.toml
