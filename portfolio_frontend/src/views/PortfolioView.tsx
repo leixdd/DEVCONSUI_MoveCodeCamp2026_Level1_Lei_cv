@@ -98,10 +98,12 @@ const PortfolioView = () => {
   // ==========================================================================
   // STATE MANAGEMENT
   // ==========================================================================
-  const objectId = "0xe6606a397cde79f1aee01ed7c21968844b360c2cea8bbc950b723dd330bcc113";
-  
+  const objectId = import.meta.env.VITE_PORTFOLIO_OBJECT_ID ?? "";
+  const suiNetwork = import.meta.env.VITE_SUI_NETWORK ?? "mainnet";
+
   // Network state - default to testnet, can be changed if needed
-  const [currentNetwork, setCurrentNetwork] = useState<"testnet" | "mainnet">("mainnet");
+  const [currentNetwork, setCurrentNetwork] = useState<"testnet" | "mainnet">(suiNetwork as "testnet" | "mainnet");
+
   
   const [portfolioData, setPortfolioData] = useState(defaultPortfolioData);
   const [isLoading, setIsLoading] = useState(false);
