@@ -52,7 +52,7 @@ exit 1
 fi
 
 #obtain the "published-at" value from the Published.toml file
-SUI_CONTRACT_PACKAGE_ID=$(grep "published-at" "$SUI_CONTRACT_PATH/Published.toml" | awk -F'=' '{print $2}' | tr -d ' ')
+SUI_CONTRACT_PACKAGE_ID=$(grep "published-at" "$SUI_CONTRACT_PATH/Published.toml" | awk -F'=' '{gsub(/"/,""); print $2}' | tr -d ' ')
 
 DATE_TODAY=$(date +%Y%m%d)
 
@@ -62,5 +62,10 @@ sui client call \
 --module portfolio \
 --function create_portfolio \
 --args $WALLET_ADDRESS $NAME $COURSE $SCHOOL $ABOUT $LINKEDIN_URL $GITHUB_URL $SKILLS \
---gas-budget 1000000000
---json > "$SUI_CONTRACT_PATH/tx_portfolios/$DATE_TODAY.json"
+--gas-budget 1000000000 \
+> "$SUI_CONTRACT_PATH/tx_portfolios/$DATE_TODAY.json"
+
+
+echo "Portfolio created successfully"
+echo "Transaction data saved to: $SUI_CONTRACT_PATH/tx_portfolios/$DATE_TODAY.json"
+
