@@ -100,6 +100,7 @@ const PortfolioView = () => {
   // ==========================================================================
   const objectId = import.meta.env.VITE_PORTFOLIO_OBJECT_ID ?? "";
   const suiNetwork = import.meta.env.VITE_SUI_NETWORK ?? "mainnet";
+  const imageUrl = import.meta.env.VITE_IMAGE_URL ?? "";
 
   // Network state - default to testnet, can be changed if needed
   const [currentNetwork, setCurrentNetwork] = useState<"testnet" | "mainnet">(suiNetwork as "testnet" | "mainnet");
@@ -261,7 +262,7 @@ const PortfolioView = () => {
           {/* Profile Image - Static local image only */}
           <div className="avatar">
             <img
-              src="/profile.png"
+              src={imageUrl}
               alt={portfolioData.name}
               crossOrigin="anonymous"
               style={{
