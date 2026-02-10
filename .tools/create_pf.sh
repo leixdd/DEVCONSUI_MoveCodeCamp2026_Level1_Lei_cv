@@ -54,6 +54,7 @@ fi
 #obtain the "published-at" value from the Published.toml file
 SUI_CONTRACT_PACKAGE_ID=$(grep "published-at" "$SUI_CONTRACT_PATH/Published.toml" | awk -F'=' '{print $2}' | tr -d ' ')
 
+DATE_TODAY=$(date +%Y%m%d)
 
 # call the create_portfolio functon using sui client call command
 sui client call \
@@ -62,3 +63,4 @@ sui client call \
 --function create_portfolio \
 --args $WALLET_ADDRESS $NAME $COURSE $SCHOOL $ABOUT $LINKEDIN_URL $GITHUB_URL $SKILLS \
 --gas-budget 1000000000
+--json > "$SUI_CONTRACT_PATH/tx_portfolios/$DATE_TODAY.json"
