@@ -39,3 +39,7 @@ build/
 .move/
 move_stdlib/
 move_book/
+
+
+#move lock
+Move.lock
