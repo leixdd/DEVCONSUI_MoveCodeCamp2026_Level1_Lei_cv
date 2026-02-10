@@ -7,15 +7,26 @@ SUI_CONTRACT_PATH="$PWD/portfolio_contract"
 WALLET_ADDRESS=$(sui client active-address)
 
 #args
-NAME=$1
-COURSE=$2
-SCHOOL=$3
-ABOUT=$4
-LINKEDIN_URL=$5
-GITHUB_URL=$6
-SKILLS=$7
+NETWORK=$1
+NAME=$2
+COURSE=$3
+SCHOOL=$4
+ABOUT=$5
+LINKEDIN_URL=$6
+GITHUB_URL=$7
+SKILLS=$8
+
+#number of args should be 8
+if [ $# -ne 8 ]; then
+echo "Number of arguments should be 8"
+exit 1
+fi
 
 # validate per args if has value
+if [ -z "$NETWORK" ]; then
+echo "Network is required (testnet or mainnet)"
+exit 1
+fi
 if [ -z "$NAME" ]; then
 echo "Name is required"
 exit 1
@@ -51,19 +62,24 @@ echo "Published.toml does not exist"
 exit 1
 fi
 
-#obtain the "published-at" value from the Published.toml file
-SUI_CONTRACT_PACKAGE_ID=$(grep "published-at" "$SUI_CONTRACT_PATH/Published.toml" | awk -F'=' '{gsub(/"/,""); print $2}' | tr -d ' ')
+if [ "$NETWORK" == "mainnet" ]; then
+SUI_CONTRACT_PACKAGE_ID=$(awk -F' = ' '/\[published.mainnet\]/{f=1} f==1 && /published-at/{print $2; exit} f==1 && /^\[/{if(!/published.mainnet/)f=0}' "$SUI_CONTRACT_PATH/Published.toml" | tr -d '"')
+else
+SUI_CONTRACT_PACKAGE_ID=$(awk -F' = ' '/\[published.testnet\]/{f=1} f==1 && /published-at/{print $2; exit} f==1 && /^\[/{if(!/published.testnet/)f=0}' "$SUI_CONTRACT_PATH/Published.toml" | tr -d '"')
+fi
+
+echo "SUI_CONTRACT_PACKAGE_ID: $SUI_CONTRACT_PACKAGE_ID"
 
 DATE_TODAY_W_TIMESTAMP=$(date +%Y%m%d%H%M%S)
 
-SUI_CONTRACT_TX_PORTFOLIOS_PATH="$SUI_CONTRACT_PATH/tx_portfolios/$DATE_TODAY_W_TIMESTAMP.json"
+SUI_CONTRACT_TX_PORTFOLIOS_PATH="$SUI_CONTRACT_PATH/tx_portfolios/$NETWORK-$DATE_TODAY_W_TIMESTAMP.json"
 
 # call the create_portfolio functon using sui client call command
 sui client call \
 --package $SUI_CONTRACT_PACKAGE_ID \
 --module portfolio \
 --function create_portfolio \
---args $WALLET_ADDRESS $NAME $COURSE $SCHOOL $ABOUT $LINKEDIN_URL $GITHUB_URL $SKILLS \
+--args "$WALLET_ADDRESS" "$NAME" "$COURSE" "$SCHOOL" "$ABOUT" "$LINKEDIN_URL" "$GITHUB_URL" "$SKILLS" \
 --gas-budget 10000000 \
 > "$SUI_CONTRACT_TX_PORTFOLIOS_PATH"
 
@@ -76,6 +92,7 @@ fi
 IS_SUCCESS=$(grep "ProgrammableTransaction" "$SUI_CONTRACT_TX_PORTFOLIOS_PATH")
 if [ -z "$IS_SUCCESS" ]; then
 echo "Transaction failed"
+echo "Transaction data: $SUI_CONTRACT_TX_PORTFOLIOS_PATH"
 exit 1
 fi
 
